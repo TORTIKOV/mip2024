@@ -3,7 +3,7 @@ import time
 import numpy as np
 
 dt = 1/240 # pybullet simulation step
-q0 = 0.5     # starting position (radian)
+q0 = 0.5   # starting position (radian)
 jIdx = 1
 maxTime = 10
 logTime = np.arange(0.0, maxTime, dt)
