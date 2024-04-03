@@ -13,8 +13,9 @@ logPos[0] = q0
 idx = 0
 
 physicsClient = p.connect(p.DIRECT) # or p.DIRECT for non-graphical version
-p.setGravity(0,0,-10)
-boxId = p.loadURDF("./pendulum.urdf", useFixedBase=True)
+p.setGravity(0, 0, -10)
+boxId = p.loadURDF("pendulum.urdf", useFixedBase=True)
+p.changeDynamics(boxId, jIdx, linearDamping=0.0)
 
 # go to the starting position
 p.setJointMotorControl2(bodyIndex=boxId, jointIndex=jIdx, targetPosition=q0, controlMode=p.POSITION_CONTROL)
@@ -25,7 +26,6 @@ for _ in range(1000):
 p.setJointMotorControl2(bodyIndex=boxId, jointIndex=jIdx, targetVelocity=0, controlMode=p.VELOCITY_CONTROL, force=0)
 for t in logTime[1:]:
     p.stepSimulation()
-    #time.sleep(dt)
 
     jointState = p.getJointState(boxId, jIdx)
     th1 = jointState[0]
@@ -35,9 +35,16 @@ for t in logTime[1:]:
 import matplotlib.pyplot as plt
 
 plt.grid(True)
-plt.plot(logTime, logPos, label = "simPos")
+plt.plot(logTime, logPos, label="simPos")
 plt.legend()
 
 plt.show()
 
 p.disconnect()
+
+from model import logTheta
+diff = logTheta - logPos
+l2_norm = np.linalg.norm(diff, ord=2) / np.sqrt(len(diff))
+linf_norm = np.max(np.abs(diff))
+print("L2:", l2_norm)
+print("Linf:", linf_norm)
