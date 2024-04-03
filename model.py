@@ -1,38 +1,27 @@
 import numpy as np
+from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 
-maxTime = 10
+maxTime = 5
 L = 0.8
 g = 10
+maxTime = 10
+L = 0.8
 dt = 1/240 # pybullet simulation step
 q0 = 0.5   # starting position (radian)
 logTime = np.arange(0.0, maxTime, dt)
 
+def rp(x, t):
+    return [x[1], 
+            -g/L*np.sin(x[0])]
 
-def rp(x):
-    y = np.array([x[1], -g / L * np.sin(x[0])])
-    return y[-1]
-
-
-def symplectic_euler(rp, x0, dt, t):
-    N = len(t)
-    x = np.zeros((N, len(x0)))
-    x[0] = x0
-    v = np.zeros((N, len(x0)))
-    v[0] = 0
-
-    for i in range(1, N):
-        v[i] = v[i - 1] + rp(x[i - 1]) * dt
-        x[i] = x[i - 1] + v[i] * dt
-    return x
-
-
-theta = symplectic_euler(rp, [q0, 0], dt, logTime)
-logTheta = theta[:, 0]
+theta = odeint(rp, [q0, 0], logTime)
+logTheta = theta[:,0]
 
 plt.grid(True)
-plt.plot(logTime, np.sin(logTheta), label="theorPos")
+plt.plot(logTime, logTheta, label = "theorPos")
 plt.legend()
+
 plt.show()
 
 # 1 избавиться от затухания синуса
